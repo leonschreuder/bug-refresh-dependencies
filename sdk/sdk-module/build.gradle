@@ -1,2 +1,5 @@
 apply plugin: 'java'
 
+dependencies {
+    compile project(':sdk-module-api')
+}

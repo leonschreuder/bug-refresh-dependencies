@@ -40,16 +40,16 @@ allprojects { project ->
         }
 
         incoming.beforeResolve {
+
             allDependencies*.each { dep ->
                 if ( dep.getVersion()?.endsWith( '-SNAPSHOT' ) ) {
                     if ( dep.metaClass.respondsTo( 'setChanging', Boolean ) ) {
                         dep.setChanging( true )
-                        logger.info("Set dependency '${dep.group}:${dep.name}:${dep.version}' to changing.")
+                        logger.info("DEBUG: Set dependency '${dep.group}:${dep.name}:${dep.version}' to changing.")
                     }
                 }
             }
         }
-
 
         // Make sure to check all '*-SNAPSHOT' branches are marked as 'changing'
         // This should actually not be necessary anymore. I guess gradle has trouble with -SNAPSHOT versions that are set through variables.
@@ -74,27 +74,6 @@ allprojects { project ->
                 }
             }
         }
-
-        // // Make a dependency to a module that's called "some-name" into ":some:some-name"
-        // resolutionStrategy.dependencySubstitution.all { DependencySubstitution dependency ->
-        //     if (dependency.requested instanceof ModuleComponentSelector) {
-        //         def projectPath = ":${dependency.requested.module}"
-        //         def baseProjectPath
-        //         if(projectPath.contains('-')) {
-        //             baseProjectPath = projectPath - ~/-.*/
-        //             projectPath = "$baseProjectPath$projectPath"
-        //         }
-        //         def targetProject = findProject(projectPath)
-        //         if (targetProject != null) {
-        //             if(baseProjectPath) {
-        //                 evaluationDependsOn(baseProjectPath)
-        //             } else {
-        //                 evaluationDependsOn(projectPath)
-        //             }
-        //             dependency.useTarget targetProject
-        //         }
-        //     }
-        // }
     }
 }
 

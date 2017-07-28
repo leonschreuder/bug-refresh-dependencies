@@ -1,6 +1,8 @@
 package com.bug.refresh.dependencies.api;
 
-public interface ISdk {
+import com.bug.refresh.IRoot;
+
+public interface ISdk extends IRoot {
     public String getSomeString();
-    public String getSomeOtherString();
+    // public String getSomeOtherString();
 }
