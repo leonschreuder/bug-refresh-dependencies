@@ -1,0 +1,14 @@
+apply plugin: 'java'
+
+def version = "master-SNAPSHOT"
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    compile("com.bug.refresh.dependencies:sdk-module:${version}")
+
+    testCompile('junit:junit:4.12')
+    testCompile('org.assertj:assertj-core:3.6.1')
+    testCompile('org.mockito:mockito-core:2.3.0')
+    testCompile('org.hamcrest:hamcrest-core:1.3')
+}
+

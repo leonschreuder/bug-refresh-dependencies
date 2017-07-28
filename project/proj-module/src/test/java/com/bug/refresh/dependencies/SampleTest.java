@@ -1,6 +1,5 @@
 package com.bug.refresh.dependencies;
 
-import en.bug.refresh.dependencies.Sample;
 import org.junit.Test;
 
 import java.io.PrintStream;
