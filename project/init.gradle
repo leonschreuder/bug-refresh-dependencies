@@ -1,0 +1,69 @@
+allprojects { project ->
+
+    configurations.all { config ->
+
+        // Always check for updated projects immediately
+        resolutionStrategy {
+            cacheChangingModulesFor 0, 'seconds' //Always check modules marked 'changing'
+            cacheDynamicVersionsFor 0, 'seconds' //Always check modules with "+", "latest" or "SNAPSHOT" in the version
+        }
+
+        incoming.beforeResolve {
+            allDependencies*.each { dep ->
+                if ( dep.getVersion()?.endsWith( '-SNAPSHOT' ) ) {
+                    if ( dep.metaClass.respondsTo( 'setChanging', Boolean ) ) {
+                        dep.setChanging( true )
+                        logger.info("Set dependency '${dep.group}:${dep.name}:${dep.version}' to changing.")
+                    }
+                }
+            }
+        }
+
+
+        // Make sure to check all '*-SNAPSHOT' branches are marked as 'changing'
+        // This should actually not be necessary anymore. I guess gradle has trouble with -SNAPSHOT versions that are set through variables.
+        afterEvaluate {
+            if (config.state != org.gradle.api.artifacts.Configuration.State.UNRESOLVED) {
+                throw new GradleException("ERROR: Dependencies have been resolved before final configuration could be applied.\nPlease wrap the code that modifies $config in an afterEvaluate{} or doFirst{} block.")
+            }
+            allDependencies*.each { dep ->
+                if (dep instanceof ExternalModuleDependency) {
+
+                    if (dep.version.equals('${versionForBranch}')) {
+                        // Variables in single quotes are not actually an error in Gradle, and is evaluated correctly later, but is
+                        // actually incorrect and we don't want to take care of such flakyness.
+                        throw new GradleException("ERROR: Incorrect syntax: '\${versionForBranch}' used in single-quotes: '${dep.group}:${dep.name}:${dep.version}' in $config.")
+                    }
+
+                    if (dep.version.endsWith("-SNAPSHOT")) {
+                        dep.setChanging(true)
+                    } else if (dep.group.equals('de.esolutions')) {
+                        logger.warn("WARNING: Custom version used for eso project '${dep.group}:${dep.name}:${dep.version}' in $config. Don't forget to fix this before comitting.")
+                    }
+                }
+            }
+        }
+
+        // // Make a dependency to a module that's called "some-name" into ":some:some-name"
+        // resolutionStrategy.dependencySubstitution.all { DependencySubstitution dependency ->
+        //     if (dependency.requested instanceof ModuleComponentSelector) {
+        //         def projectPath = ":${dependency.requested.module}"
+        //         def baseProjectPath
+        //         if(projectPath.contains('-')) {
+        //             baseProjectPath = projectPath - ~/-.*/
+        //             projectPath = "$baseProjectPath$projectPath"
+        //         }
+        //         def targetProject = findProject(projectPath)
+        //         if (targetProject != null) {
+        //             if(baseProjectPath) {
+        //                 evaluationDependsOn(baseProjectPath)
+        //             } else {
+        //                 evaluationDependsOn(projectPath)
+        //             }
+        //             dependency.useTarget targetProject
+        //         }
+        //     }
+        // }
+    }
+}
+
