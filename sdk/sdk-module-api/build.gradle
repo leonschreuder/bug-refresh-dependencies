@@ -1,2 +1,7 @@
 apply plugin: 'java'
+group = "com.bug.refresh.dependencies"
 
+version="master-SNAPSHOT"
+dependencies {
+  compile("com.bug.refresh.dependencies:dal:${version}")
+}

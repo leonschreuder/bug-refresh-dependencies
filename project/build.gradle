@@ -1,1 +1,61 @@
 apply plugin: 'java'
+
+
+import org.gradle.composite.internal.DefaultIncludedBuild
+import org.gradle.api.internal.project.DefaultProject
+
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
+import org.gradle.api.internal.artifacts.result.DefaultResolvedDependencyResult
+import org.gradle.api.internal.artifacts.result.DefaultResolvedComponentResult
+import org.gradle.internal.component.local.model.DefaultProjectComponentIdentifier
+
+def version = "master-SNAPSHOT"
+dependencies {
+  compile("com.bug.refresh.dependencies:sdk-module:${version}")
+}
+
+class Node {
+  public String name
+  public List<Node> children = new ArrayList<>()
+}
+
+def root = new Node()
+
+private static String stringPath(DefaultProjectComponentIdentifier id) {
+  String projectPath = id.getProjectPath()
+  if (id.build.getName().equals(":")) {
+    return projectPath;
+  } else {
+    return projectPath.equals(":") ? ":" + id.build.getName() : ":" + id.build.getName() + projectPath;
+  }
+}
+
+
+task dependencyReport {
+  afterEvaluate {
+    configurations.compile.incoming.resolutionResult.allDependencies { DefaultResolvedDependencyResult dep ->
+      DefaultProjectComponentIdentifier fromId = dep.from.getId()
+      DefaultProjectComponentIdentifier depId = dep.selected.getId()
+      String fromPath = fromId.build.name
+      String depPath = depId.build.name
+//      String fromPath = stringPath(fromId)
+//      String depPath = stringPath(depId)
+
+      if (fromPath != depPath) {
+        println "from: ${fromPath}  -> ${depPath}"
+        def n = new Node(name: depPath)
+
+        if (root.name != depPath)
+          n.children.add(root)
+
+        if (!n.children.any { it.name == fromPath })
+          n.children.add(new Node(name: fromPath))
+        root = n
+      }
+    }
+    println root.name
+    println root.children*.name
+    println root.children*.children*.name
+  }
+}
+

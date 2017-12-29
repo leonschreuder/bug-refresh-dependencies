@@ -1,4 +1,6 @@
 apply plugin: 'java'
+group = "com.bug.refresh.dependencies"
+version="master-SNAPSHOT"
 
 dependencies {
     compile project(':sdk-module-api')

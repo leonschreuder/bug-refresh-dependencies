@@ -1,0 +1,11 @@
+import static java.io.File.separator
+
+rootProject.name = 'dal'
+
+gradle.ext.projectsBaseDir = settingsDir.canonicalPath
+file(gradle.projectsBaseDir).eachDir { currentDir ->
+    if (file(currentDir.path + separator + "build.gradle").exists()) {
+        include currentDir.name
+        logger.debug("including sub-module ${currentDir.name} (${currentDir})")
+    }
+}

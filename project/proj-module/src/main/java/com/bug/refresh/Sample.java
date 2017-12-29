@@ -14,6 +14,10 @@ public class Sample implements ISdk {
         return "rootString";
     }
 
+    public String rootString2() {
+        return "rootString";
+    }
+
     // public String getSomeOtherString() {
     //     return "some other string";
     // }

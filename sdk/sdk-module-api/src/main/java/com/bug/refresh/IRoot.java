@@ -1,7 +1,9 @@
 package com.bug.refresh;
 
-public interface IRoot {
-    public String rootString();
-    // public String rootString2();
+import com.bug.refresh.dependencies.api.IDal;
+
+public interface IRoot extends IDal {
+    // public String rootString();
+    public String rootString2();
 }
 
